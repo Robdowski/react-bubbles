@@ -10,6 +10,7 @@ const initialColor = {
 const ColorList = ({ colors, updateColors }) => {
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [colorToAdd, setColorToAdd] = useState(initialColor)
 
   const editColor = color => {
     setEditing(true);
@@ -39,6 +40,16 @@ const ColorList = ({ colors, updateColors }) => {
     .catch(err => console.log(err))
   };
 
+  const addColor = e =>{
+    e.preventDefault()
+    axiosWithAuth()
+    .post('http://localhost:5000/api/colors', colorToAdd)
+    .then(res => {
+      updateColors(res.data)
+      setColorToAdd(initialColor)
+    })
+    .catch(err => console.log(err))
+  }
 
   return (
     <div className="colors-wrap">
@@ -89,9 +100,18 @@ const ColorList = ({ colors, updateColors }) => {
           </div>
         </form>
       )}
+      {!editing &&(
+        <form onSubmit={addColor}>
+      <label>Color:
+        <input htmlFor='color' name='color' value={colorToAdd.color} onChange={e => setColorToAdd({...colorToAdd, color: e.target.value})}/></label>
+        <label>Code:
+        <input htmlFor='code' name='code' value={colorToAdd.code.hex} onChange={e=> setColorToAdd({...colorToAdd, code: {hex: e.target.value}})} /></label>
+        <button type='submit'>Add Color</button>
+      </form>
+      )}
       <div className="spacer" />
-      {/* stretch - build another form here to add a color */}
-    </div>
+      </div>
+      
   );
 };
 
